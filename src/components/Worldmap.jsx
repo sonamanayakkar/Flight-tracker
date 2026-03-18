@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import india from '../components/images/india.jpg'
 import './styles/world.css'
 import axios from 'axios'
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -8,9 +9,13 @@ import L from 'leaflet'
 const Worldmap = () => {
 
     let [flightdata, setFlightdata] = useState([])
-    let [filter1, setFilter] = useState('all')
-    console.log(filter1);
+    let [search, setSearch] = useState('')
 
+    let searchvalue = useRef(null)
+
+    let submitingdata = () => {
+        setSearch(searchvalue.current.value)
+    }
 
     useEffect(() => {
         let apicall = async () => {
@@ -20,38 +25,33 @@ const Worldmap = () => {
             )
 
             let final = api.data.states
-
+            debugger
 
             let india = final.filter((ele, idx) => {
 
-
-                let lon = ele[5];
-                let lat = ele[6];
-
-                if (filter1 == 'India') {
+                let country = ele[2]
+                if (search == '') {
                     return (
-                        lon !== null &&
-                        lat !== null &&
-                        lon >= 68.7 && lon <= 97.25 &&
-                        lat >= 6.4 && lat <= 37.6
+                        country == 'India'
                     )
                 }
-               
-                
-
+                let text = search.toLowerCase()
+                return (
+                    country?.toLowerCase().includes(text)
+                )
 
             })
 
-            console.log('one', india);
+            // console.log('one', india);
 
             setFlightdata(india)
 
         }
 
         apicall()
-    }, [filter1])
-    // console.log("hi");
-    // console.log(flightdata[0])
+    }, [search])
+
+    //object conversion
     let fil;
     if (flightdata && flightdata.length > 0) {
 
@@ -61,6 +61,7 @@ const Worldmap = () => {
             lat: ele[6],
             degree: ele[10],
             onground: ele[8],
+            speed: ele[9],
             cd: ele[11]
         }))
 
@@ -96,7 +97,7 @@ const Worldmap = () => {
                     <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
 
                     {flightdata && flightdata.length > 0 ? (
-                        fil.filter(ele => ele.lat !== null && ele.lon !== null)
+                        fil.filter(ele => ele.lat !== null && ele.long !== null)
 
                             .map((ele, idx) => {
                                 let lon = ele.long || null;
@@ -106,6 +107,7 @@ const Worldmap = () => {
                                         ✈️ {"aero" || "No Name"} <br />
                                         Country: {ele.region} <br />
                                         onground: {ele.onground} m/s <br />
+                                        speed:{ele.speed}<br/>
                                         cd: {ele.cd}
                                     </Popup>
                                 </Marker>
@@ -116,14 +118,213 @@ const Worldmap = () => {
                     }
                 </MapContainer>
 
-                <div className="filter">
+                {/* <div className="filter">
                     <select name="" id="" onChange={(e) => setFilter(e.target.value)}>
                         <option value="all">All</option>
                         <option value="India">Arround india</option>
                         <option value="ground">on ground</option>
                         <option value="">onsky</option>
-                        {/* <option value=""></option> */}
                     </select>
+                </div> */}
+
+                <div className="search">
+                    <input type="text" ref={searchvalue} placeholder='Search by country' name="" id="" />
+                    <button onClick={submitingdata}>Search</button>
+                </div>
+
+                <div className="totallists">
+
+                    {flightdata && flightdata.length > 0 ? (
+
+                        fil.filter(ele => ele.lat != null && ele.long != null && ele.cd!=null)
+                            .map((ele, idx) => (
+                                <div className="p">
+                                    <div className="two">
+                                        <div className="L d-flex gap-3 align-item-center">
+                                            <div className="image">
+                                                <img src={india} alt="" />
+                                            </div>
+                                            
+                                            <h5 className='text-white m-0'>{ele.region}</h5>
+                                        </div>
+                                        <div className="L d-flex gap-4 ">
+                                            <div className="loc text-white-50 ">{ele.lat}</div>
+                                            <div className="loc text-white-50 ">{ele.long}</div>
+                                        </div>
+                                    </div>
+                                    <div className="two2">
+                                        <h5 className='text-white'>speed:{ele.speed}</h5>
+                                        <h4>On Ground Status:{ele.onground==true?'flight on ground':"flight on sky"}</h4>
+                                        <h4>climbing:{ele.cd}</h4>
+                                    </div>
+                                </div>
+                            ))
+
+                    ):(<p>no data found</p>)
+                      
+                    }
+
+                    {/* <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div>
+
+                    <div className="p">
+                        <div className="two">
+                            <div className="L d-flex gap-3 align-item-center">
+                                <div className="image">
+                                    <img src={india} alt="" />
+                                </div>
+
+                                <h5 className='text-white m-0'>India</h5>
+                            </div>
+                            <div className="L d-flex gap-4 ">
+                                <div className="loc text-white-50 ">15.20</div>
+                                <div className="loc text-white-50 ">20.1</div>
+                            </div>
+                        </div>
+                        <div className="two2">
+                            <h4>On Ground Status:true</h4>
+                            <h4>climbing</h4>
+                        </div>
+                    </div> */}
+
+
                 </div>
 
             </div>
