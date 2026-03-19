@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import india from '../components/images/india.jpg'
+import flightlogo from './images/flightlogo.png'
 import './styles/world.css'
 import axios from 'axios'
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -10,6 +11,10 @@ const Worldmap = () => {
 
     let [flightdata, setFlightdata] = useState([])
     let [search, setSearch] = useState('')
+    let [filter, setFilter] = useState('All')
+    let[toggle,setToggle]=useState(false)
+
+    let slide=useRef(null)
 
     let searchvalue = useRef(null)
 
@@ -25,20 +30,55 @@ const Worldmap = () => {
             )
 
             let final = api.data.states
-            debugger
+            
 
             let india = final.filter((ele, idx) => {
 
                 let country = ele[2]
-                if (search == '') {
-                    return (
-                        country == 'India'
-                    )
+                let ground = ele[8] 
+                let lat =ele[6]
+                let long=ele[5]
+                if (search == '' || search == 'india') {   //country
+                    if (filter == 'All') {
+                        return (
+                            country == 'India' && lat !== null && long !== null
+                        )
+                    }
+
+                    else if (filter == 'ground') {
+                        return (
+                            country == 'India' && ground && lat !== null && long !== null
+                        )
+                    }
+                    else if (filter == 'sky') {
+                        return (
+                           country == 'India' && !ground && lat !== null && long !== null
+                        )
+                    }
+
                 }
-                let text = search.toLowerCase()
-                return (
-                    country?.toLowerCase().includes(text)
-                )
+
+                else {
+                    let text = search.toLowerCase()
+
+                    if (filter == 'All') {
+                        return (
+                            country?.toLowerCase().includes(text) && lat !== null && long !== null
+                        )
+                    }
+
+                    else if (filter == 'ground') {
+                        return (
+                            country?.toLowerCase().includes(text) && ground && lat !== null && long !== null
+                        )
+                    }
+                    else if (filter == 'sky') {
+                        return (
+                            country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null
+                        )
+                    }
+                }
+
 
             })
 
@@ -49,7 +89,7 @@ const Worldmap = () => {
         }
 
         apicall()
-    }, [search])
+    }, [search, filter])
 
     //object conversion
     let fil;
@@ -69,12 +109,7 @@ const Worldmap = () => {
 
 
     }
-    // console.log('hi');
-
-    // console.log(fil);
-
-
-
+   
 
     let createplaneicon = (angle) => {
         return L.divIcon({
@@ -82,6 +117,17 @@ const Worldmap = () => {
             html: `<div class="plane" style="transform: rotate(${angle}deg)">✈️</div>`,
             iconSize: [30, 30],
         })
+    }
+
+
+    let click=()=>{
+        if (toggle) {
+            slide.current.style.top="100%"
+        }
+        else{
+             slide.current.style.top="80px"
+        }
+        setToggle(!toggle)
     }
 
 
@@ -107,7 +153,7 @@ const Worldmap = () => {
                                         ✈️ {"aero" || "No Name"} <br />
                                         Country: {ele.region} <br />
                                         onground: {ele.onground} m/s <br />
-                                        speed:{ele.speed}<br/>
+                                        speed:{ele.speed}<br />
                                         cd: {ele.cd}
                                     </Popup>
                                 </Marker>
@@ -132,11 +178,19 @@ const Worldmap = () => {
                     <button onClick={submitingdata}>Search</button>
                 </div>
 
-                <div className="totallists">
+                <div className="totallists" ref={slide}>
+
+                    <div className="filter">
+                        <select name="" id="" onChange={(e) => setFilter(e.target.value)}>
+                            <option value="All">All</option>
+                            <option value="ground">On Ground</option>
+                            <option value="sky">On Sky</option>
+                        </select>
+                    </div>
 
                     {flightdata && flightdata.length > 0 ? (
 
-                        fil.filter(ele => ele.lat != null && ele.long != null && ele.cd!=null)
+                        fil.filter(ele => ele.lat != null && ele.long != null)
                             .map((ele, idx) => (
                                 <div className="p">
                                     <div className="two">
@@ -144,7 +198,7 @@ const Worldmap = () => {
                                             <div className="image">
                                                 <img src={india} alt="" />
                                             </div>
-                                            
+
                                             <h5 className='text-white m-0'>{ele.region}</h5>
                                         </div>
                                         <div className="L d-flex gap-4 ">
@@ -154,15 +208,20 @@ const Worldmap = () => {
                                     </div>
                                     <div className="two2">
                                         <h5 className='text-white'>speed:{ele.speed}</h5>
-                                        <h4>On Ground Status:{ele.onground==true?'flight on ground':"flight on sky"}</h4>
+                                        <h4>On Ground Status:{ele.onground == true ? 'flight on ground' : "flight on sky"}</h4>
                                         <h4>climbing:{ele.cd}</h4>
                                     </div>
                                 </div>
                             ))
 
-                    ):(<p>no data found</p>)
-                      
+                    ) : (<p>no data found</p>)
+
                     }
+
+                    <div className="total d-flex gap-3 ">
+                        <div className="flightimg"><img src={flightlogo} alt="" /></div>
+                        <div className="count m-0 text-white">{flightdata.length}</div>
+                    </div>
 
                     {/* <div className="p">
                         <div className="two">
@@ -329,7 +388,9 @@ const Worldmap = () => {
 
             </div>
 
-
+            <div className="up" onClick={click}>
+                <i class="fa-solid fa-angles-up"></i>
+            </div>
         </section >
     );
 }
