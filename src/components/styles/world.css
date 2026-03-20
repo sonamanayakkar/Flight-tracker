@@ -1,4 +1,3 @@
-
 .map {
     position: relative;
     height: 100vh;
@@ -20,9 +19,9 @@
 
 .filter select {
     padding: 5px 20px;
-    background-color: rgb(0, 153, 255);
+    background-color: rgb(61, 177, 255);
     border-radius: 20px;
-    border: 1px solid rgba(128, 128, 128, 0.478);
+    border: none;
     color: rgb(255, 255, 255);
 
 }
@@ -67,10 +66,10 @@ input:focus {
     position: absolute;
     top: 80px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.459);
-    width: 30%;
-    padding: 20px;
-    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.814);
+    width: 25%;
+    padding: 10px;
+    /* border-radius: 20px; */
     height: 85vh;
     overflow: auto;
     transition: .2s ease-in;
@@ -86,7 +85,7 @@ input:focus {
 }
 
 .totallists::-webkit-scrollbar-thumb {
-    background: #ffffff;
+    background: #0059ff;
     border-radius: 10px;
 }
 
@@ -95,21 +94,39 @@ input:focus {
     margin-bottom: 20px;
     width: 100%;
     border: 1px rgba(115, 115, 115, 0.284) solid;
-    padding: 10px;
+
     border-radius: 10px;
-    background-color: rgba(29, 27, 27, 0.782);
+    box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.37);
+    background-color: rgb(255, 255, 255);
 }
 
 .totallists .p .two {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px;
+
+}
+
+.totallists .p .two .indication {
+    width: 1vw;
+    height: 1vw;
+    border-radius: 50%;
+}
+
+.f {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.295);
+    border-radius: 0 0 10px 10px;
+}
+
+h5 {
+    font-size: 1rem;
 }
 
 .totallists .p .two .image {
 
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
 }
@@ -117,15 +134,10 @@ input:focus {
 .totallists .p .two .image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
-.two2 h4 {
-    background: linear-gradient(to right, orange, white);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+
 
 .loc {
     border: 1px rgba(115, 115, 115, 0.284) solid;
@@ -140,7 +152,7 @@ input:focus {
     bottom: 50px;
     padding: 2px 20px;
     border-radius: 30px;
-    background-color: rgb(0, 115, 255);
+    background-color: rgb(0, 119, 255);
     align-items: center;
 }
 
@@ -157,55 +169,195 @@ input:focus {
     object-fit: contain;
 }
 
-.up{
+.up {
     position: absolute;
     bottom: 20px;
     left: 50%;
 }
 
+.views {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background-color: #ffffffd7;
+    padding: 10px;
+    border-radius: 30px;
+}
+
+.views .r {
+    position: relative;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 40px;
+    height: 40px;
+    border: 1px black solid;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.views span {
+    font-size: .7rem;
+    font-weight: 500;
+}
+
+.views .r img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+  .up {
+    position: absolute;
+    z-index: 6;
+    bottom: 20px;
+    left: 50%;
+    font-size: 1.5rem;
+    color: rgb(0, 0, 0);
+    display: none;
+}
+
+
+
+/*-------------loader----------------*/
+/* From Uiverse.io by Mike11jr */
+.spinner {
+    height: 100%;
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dot1,
+.dot2,
+.dot3 {
+    width: 15px;
+    height: 15px;
+    border: double;
+    border-color: white;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+.dot1 {
+    animation: jump765 1.6s -0.32s linear infinite;
+    background: #2495ff;
+}
+
+.dot2 {
+    animation: jump765 1.6s -0.16s linear infinite;
+    background: #2495ff;
+}
+
+.dot3 {
+    animation: jump765 1.6s linear infinite;
+    background: #2495ff;
+}
+
+@keyframes jump765 {
+
+    0%,
+    80%,
+    100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+
+    40% {
+        -webkit-transform: scale(2.0);
+        transform: scale(2.0);
+    }
+}
+
+
+
 
 @media screen and (max-width:800px) {
 
     .totallists {
+        position: absolute;
+        top: 100%;
+        left: 10px;
+        width: 95%;
+        padding: 20px;
+        border-radius: 20px;
+        height: 85vh;
+        overflow: auto;
+        z-index: 5;
+    }
+    .up {
     position: absolute;
-    top: 100%;
-    left: 20px;
-    background-color: rgba(0, 0, 0, 0.459);
-    width: 90%;
-    padding: 20px;
-    border-radius: 20px;
-    height: 85vh;
-    overflow: auto;
-}
-.search {
-    position: relative;
-    display: flex;
-    align-items: center;
-    position: absolute;
+    z-index: 6;
+    bottom: 20px;
     left: 50%;
-    top: 20px;
-    transform: translate(-50%, -10%);
-    width: 70%;
+    font-size: 1.5rem;
+    color: rgb(0, 0, 0);
+    display: block;
 }
-input {
-    width: 100%;
-    padding: 0 20px;
-    height: 5vh;
-    border-radius: 30px;
-    border: none;
-}
-.search button {
-    position: absolute;
-    right: 0;
-    height: 5vh;
-    padding: 0 30px;
-    border-radius: 30px;
-    cursor: pointer;
-    background-color: rgb(0, 145, 255);
-    border: none;
-    color: white;
-    font-weight: 500;
-}
+
+   .search {
+        position: relative;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        left: 50%;
+        top: 4%;
+        transform: translate(-50%, -4%);
+        width: 70%;
+    }
+
+    input {
+        width: 100%;
+        padding: 0 20px;
+        height: 6vh;
+        border-radius: 30px;
+        border: none;
+    }
+
+   .search button {
+        position: absolute;
+        right: 0;
+        height: 6vh;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 30px;
+        cursor: pointer;
+        background-color: rgb(0, 145, 255);
+        border: none;
+        color: white;
+        font-weight: 500;
+    }
+
+    .views {
+        position: absolute;
+        display: flex;
+        gap: 10px;
+        right: 10px;
+        top: 75%;
+        background-color: #ffffffd7;
+        padding: 10px 15px;
+        border-radius: 30px;
+
+    }
+
+    .views span {
+        font-size: .7rem;
+        font-weight: 500;
+        display: none;
+    }
+
+    .views .r {
+        position: relative;
+        cursor: pointer;
+        margin-top: 0px;
+        width: 30px;
+        height: 30px;
+        border: 1px black solid;
+        border-radius: 50%;
+        overflow: hidden;
+    }
 
 
 }
