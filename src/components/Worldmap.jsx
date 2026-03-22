@@ -8,6 +8,8 @@ import axios from 'axios'
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css"
 import L from 'leaflet'
+import { useMap } from "react-leaflet";
+
 
 const Worldmap = () => {
 
@@ -17,9 +19,10 @@ const Worldmap = () => {
     let [toggle, setToggle] = useState(false)
     let [apicheck, setApicheck] = useState(false)
     let [map, setMap] = useState('http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}')
+    let [lat, setLat] = useState({ lat: 20, long: 77, zoom: 5 })
+    let [countries, setCountries] = useState([])
 
 
-    let [lat, setLan] = useState({ lat: 13.0827, lan: 80.2707 })
 
     let slide = useRef(null)
 
@@ -32,6 +35,25 @@ const Worldmap = () => {
     }
 
     useEffect(() => {
+        let countryapi = async () => {
+
+
+            let api2 = await axios.get('https://countriesnow.space/api/v0.1/countries/positions')
+            let mark_informations = api2.data.data
+            // console.log(mark_informations);
+            setCountries(mark_informations)
+
+
+
+
+
+
+        }
+
+        countryapi()
+    }, [])
+
+    useEffect(() => {
 
         let apicall = async () => {
             setApicheck(false)
@@ -39,7 +61,27 @@ const Worldmap = () => {
                 auth: { "clientId": "sonamanayakkar-api-client", "clientSecret": "HkORRn4pZKpoztKikNha6xxlGLNX2Arq" }
             })
 
+
             let final = api.data.states
+
+
+            let findlat = countries.filter((ele, idx) => {
+                if (search == "" || search == "India") {
+                    return (
+                        ele.name == 'India' && ele.lat != null && ele.long != null
+                    )
+                }
+                else {
+                    let s = search.toLowerCase()
+
+                    return (
+                        ele.name?.toLowerCase() == s && ele.lat != null && ele.long != null
+                    )
+                }
+            })
+
+
+
 
             setApicheck(true)
 
@@ -93,15 +135,12 @@ const Worldmap = () => {
 
             })
 
-            // console.log('one', india);
-
             setFlightdata(india)
+            setLat(india.length > 0 ? { ...findlat[0], zoom: 5 } || { lat: 20, long: 77, zoom: 2 } : { lat: 20, long: 77, zoom: 2 })
 
         }
 
         apicall()
-        console.log("hi");
-
 
     }, [search, filter])
 
@@ -110,7 +149,7 @@ const Worldmap = () => {
     if (flightdata && flightdata.length > 0) {
 
         fil = flightdata.map(ele => ({
-            address:ele[0],
+            address: ele[1],
             region: ele[2],
             long: ele[5],
             lat: ele[6],
@@ -132,7 +171,7 @@ const Worldmap = () => {
     }
 
     let flightclick = (id) => {
-        console.log(flightmark.current);
+        // console.log(flightmark.current);
 
 
         flightmark.current.map((ele) => {
@@ -166,13 +205,26 @@ const Worldmap = () => {
 
 
 
+    const MoveMap = ({ lat, long, zoom }) => {
+        const map = useMap();
+
+        useEffect(() => {
+            if (lat && long) {
+                map.flyTo([lat, long], zoom);
+            }
+        }, [lat, long]);
+
+        return null;
+    };
 
     // 13.0827, 80.2707
     return (
         <section>
             <div className="map">
-                <MapContainer className='link' center={[13.0827, 80.2707]} zoom={5} style={{ width: "100%", height: "100vh" }}>
+                <MapContainer className='link' center={[20, 77]} zoom={5} style={{ width: "100%", height: "100vh" }}>
                     <TileLayer url={map} />
+
+                    <MoveMap lat={lat.lat} long={lat.long} zoom={lat.zoom} />
 
                     {flightdata && flightdata.length > 0 ? (
 
@@ -181,7 +233,7 @@ const Worldmap = () => {
                             let lat = ele.lat;
                             return (<Marker Marker key={idx} position={[lat, lon]} icon={createplaneicon(ele.degree)} eventHandlers={{ click: () => flightclick(idx) }}>
                                 <Popup>
-                                    ✈️ {"aero" || "No Name"} <br />
+                                    ✈️ {ele.address || "No Name"} <br />
                                     Country: {ele.region} <br />
                                     onground: {ele.onground} m/s <br />
                                     speed:{ele.speed}<br />
@@ -197,9 +249,9 @@ const Worldmap = () => {
 
 
                 <div className="search">
-                    
+
                     <input type="text" ref={searchvalue} placeholder='Search by country' name="" id="" />
-                    <button onClick={submitingdata}><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <button onClick={submitingdata}><i className="fa-solid fa-magnifying-glass"></i></button>
                 </div>
 
                 <div className="totallists" ref={slide}>
@@ -231,7 +283,7 @@ const Worldmap = () => {
 
                                             </div>
                                             <div className="l d-flex gap-2 align-items-center">
-                                                <div className="indication" style={ele.onground?{background:'rgb(255, 60, 0)'}:{background:'rgb(42, 255, 134)'}}></div>
+                                                <div className="indication" style={ele.onground ? { background: 'rgb(255, 60, 0)' } : { background: 'rgb(42, 255, 134)' }}></div>
                                                 <p className='m-0'>Inair</p>
                                             </div>
                                         </div>
@@ -255,10 +307,10 @@ const Worldmap = () => {
                     ) : (
 
 
-                        <div class="spinner">
-                            <div class="dot1"></div>
-                            <div class="dot2"></div>
-                            <div class="dot3"></div>
+                        <div className="spinner">
+                            <div className="dot1"></div>
+                            <div className="dot2"></div>
+                            <div className="dot3"></div>
                         </div>
                     )
                     }
