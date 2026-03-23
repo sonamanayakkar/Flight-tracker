@@ -221,6 +221,16 @@ h5 {
     height: 30px;
 }
 
+.location{
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.866);
+    border-radius: 20px;
+    padding: 10px;
+    right: 10px;
+    bottom: 30%;
+    cursor: pointer;
+}
+
 
 
 /*-------------loader----------------*/

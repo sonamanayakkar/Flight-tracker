@@ -159,7 +159,7 @@ const Worldmap = () => {
     }
 
 
-    let createplaneicon = (angle,logo) => {
+    let createplaneicon = (angle, logo) => {
         return L.divIcon({
             className: "custom-plane",
             html: `<div class="plane" style="transform: rotate(${angle}deg)"><img src=${logo} alt='plane'/></div>`,
@@ -201,7 +201,7 @@ const Worldmap = () => {
             }
             setToggle(!toggle)
         }
-       
+
 
     }
 
@@ -218,6 +218,33 @@ const Worldmap = () => {
 
         return null;
     };
+
+    //location
+
+    let mylocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+
+                    console.log(lat, lng);
+                    console.log(position.coords.accuracy)
+                    setLat({ lat: lat, long: lng, zoom: 10 }); // store in state
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                }, {
+                enableHighAccuracy: true, // 🔥 IMPORTANT
+                timeout: 10000,
+                maximumAge: 0
+            }
+
+            );
+        } else {
+            alert("Geolocation not supported");
+        }
+    }
 
     // 13.0827, 80.2707
     return (
@@ -326,6 +353,7 @@ const Worldmap = () => {
                     <span>Satilite</span>
 
                 </div>
+                <div className="location" onClick={mylocation}><i class="fa-solid fa-location-crosshairs"></i></div>
 
             </div>
 
