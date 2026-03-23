@@ -14,14 +14,17 @@ import Mark from './Mark'
 
 const Worldmap = () => {
 
-    let [flightdata, setFlightdata] = useState([])
-    let [search, setSearch] = useState('')
-    let [filter, setFilter] = useState('All')
-    let [toggle, setToggle] = useState(false)
-    let [apicheck, setApicheck] = useState(false)
-    let [map, setMap] = useState('http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}')
-    let [lat, setLat] = useState({ lat: 20, long: 77, zoom: 5 })
-    let [countries, setCountries] = useState([])
+    let [flightdata, setFlightdata] = useState([])  //flight data
+    let [search, setSearch] = useState('')    //search value
+    let [filter, setFilter] = useState('All')  // filter value
+    let [toggle, setToggle] = useState(false)  // toggle btn
+    let [apicheck, setApicheck] = useState(false) //api check
+    let [map, setMap] = useState('http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}')  //maps
+    let [lat, setLat] = useState({ lat: 20, long: 77, zoom: 5 })  //map zoom view
+    let [countries, setCountries] = useState([])      //country data
+
+    let [live, setLive] = useState({ lat: 20, long: 77, zoom: 5, mark: false })
+
 
 
 
@@ -33,6 +36,7 @@ const Worldmap = () => {
 
     let submitingdata = () => {
         setSearch(searchvalue.current.value)
+        setLive({ lat: 20, long: 77, zoom: 5, mark: false })
     }
 
     useEffect(() => {
@@ -48,7 +52,7 @@ const Worldmap = () => {
     }, [])
 
     useEffect(() => {
-
+        
         let apicall = async () => {
             setApicheck(false)
             let api = await axios.get('https://opensky-network.org/api/states/all', {
@@ -136,10 +140,10 @@ const Worldmap = () => {
             setLat(india.length > 0 ? { ...findlat[0], zoom: 5 } || { lat: 20, long: 77, zoom: 2 } : { lat: 20, long: 77, zoom: 2 })
 
         }
-
+      
         apicall()
 
-    }, [search, filter])
+    }, [search, filter, countries])
 
     //object conversion
     let fil; //[{},{},{}]    main important
@@ -163,6 +167,15 @@ const Worldmap = () => {
         return L.divIcon({
             className: "custom-plane",
             html: `<div class="plane" style="transform: rotate(${angle}deg)"><img src=${logo} alt='plane'/></div>`,
+            iconSize: [30, 30],
+        })
+    }
+    let createliveicon = () => {
+
+
+        return L.divIcon({
+            className: "custom-plane",
+            html: `<div class="plane" >📍</div>`,
             iconSize: [30, 30],
         })
     }
@@ -222,20 +235,21 @@ const Worldmap = () => {
     //location
 
     let mylocation = () => {
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     let lat = position.coords.latitude;
                     let lng = position.coords.longitude;
 
-                    console.log(lat, lng);
-                    console.log(position.coords.accuracy)
-                    setLat({ lat: lat, long: lng, zoom: 10 }); // store in state
+                    // console.log(lat, lng);
+                    // console.log(position.coords.accuracy)
+                    setLive({ lat: lat, long: lng, zoom: 10, mark: true }); // store in state
                 },
                 (error) => {
                     console.error("Error getting location:", error);
                 }, {
-                enableHighAccuracy: true, // 🔥 IMPORTANT
+                enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0
             }
@@ -253,9 +267,19 @@ const Worldmap = () => {
                 <MapContainer className='link' center={[20, 77]} zoom={5} style={{ width: "100%", height: "100vh" }}>
                     <TileLayer url={map} />
 
-                    <MoveMap lat={lat.lat} long={lat.long} zoom={lat.zoom} />
+                    <MoveMap
+                        lat={live.mark ? live.lat : lat.lat}
+                        long={live.mark ? live.long : lat.long}
+                        zoom={live.mark ? live.zoom : lat.zoom}
+                    />
+
+
 
                     <Mark datas={{ fil, createplaneicon, flightclick }} />
+
+                    {live.mark ? (<Marker position={[live.lat, live.long]} icon={createliveicon()}>
+                    </Marker>) : null}
+
 
                 </MapContainer>
 
@@ -353,7 +377,7 @@ const Worldmap = () => {
                     <span>Satilite</span>
 
                 </div>
-                <div className="location" onClick={mylocation}><i class="fa-solid fa-location-crosshairs"></i></div>
+                <div className="location" onClick={mylocation}><i className="fa-solid fa-location-crosshairs"></i></div>
 
             </div>
 
