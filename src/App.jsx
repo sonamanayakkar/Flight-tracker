@@ -13,6 +13,7 @@ function App() {
     <>
       {/* <Map /> */}
       <Worldmap />
+      {/* <Worldmap2 /> */}
     </>
   )
 }

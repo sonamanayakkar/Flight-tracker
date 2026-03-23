@@ -90,7 +90,7 @@ input:focus {
 }
 
 
-.totallists .p {
+.p {
     margin-bottom: 20px;
     width: 100%;
     border: 1px rgba(115, 115, 115, 0.284) solid;
@@ -100,7 +100,7 @@ input:focus {
     background-color: rgb(255, 255, 255);
 }
 
-.totallists .p .two {
+.p .two {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -108,7 +108,7 @@ input:focus {
 
 }
 
-.totallists .p .two .indication {
+.p .two .indication {
     width: 1vw;
     height: 1vw;
     border-radius: 50%;
@@ -123,7 +123,7 @@ h5 {
     font-size: 1rem;
 }
 
-.totallists .p .two .image {
+.p .two .image {
 
     width: 60px;
     height: 60px;
@@ -131,7 +131,7 @@ h5 {
     overflow: hidden;
 }
 
-.totallists .p .two .image img {
+.p .two .image img {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -206,7 +206,7 @@ h5 {
     object-fit: cover;
 }
 
-  .up {
+.up {
     position: absolute;
     z-index: 6;
     bottom: 20px;
@@ -214,6 +214,11 @@ h5 {
     font-size: 1.5rem;
     color: rgb(0, 0, 0);
     display: none;
+}
+
+.plane img {
+    width: 30px;
+    height: 30px;
 }
 
 
@@ -274,47 +279,59 @@ h5 {
 
 @media screen and (max-width:800px) {
 
+
+
+
     .totallists {
         position: absolute;
-        top: 100%;
+        top: 80px;
         left: 10px;
         width: 95%;
         padding: 20px;
         border-radius: 20px;
         height: 85vh;
         overflow: auto;
-        z-index: 5;
-    }
-    .up {
-    position: absolute;
-    z-index: 6;
-    bottom: 20px;
-    left: 50%;
-    font-size: 1.5rem;
-    color: rgb(0, 0, 0);
-    display: block;
-}
+        z-index: 1;
 
-   .search {
+    }
+
+
+
+    .up {
+        position: absolute;
+        z-index: 6;
+        top: 50%;
+        left: 0%;
+        font-size: 1rem;
+        color: rgb(0, 0, 0);
+        display: block;
+        background-color: rgb(255, 255, 255);
+        height: fit-content;
+        padding: 10px;
+        border-radius: 0 20% 20% 0;
+    }
+
+    .search {
         position: relative;
         display: flex;
         align-items: center;
         position: absolute;
-        left: 50%;
-        top: 4%;
+        left: 60%;
+        top: 2%;
         transform: translate(-50%, -4%);
-        width: 70%;
+        width: 75%;
     }
 
     input {
         width: 100%;
         padding: 0 20px;
         height: 6vh;
-        border-radius: 30px;
+        border-radius: 10px;
         border: none;
+
     }
 
-   .search button {
+    .search button {
         position: absolute;
         right: 0;
         height: 6vh;
@@ -322,7 +339,7 @@ h5 {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 30px;
+        border-radius: 10px;
         cursor: pointer;
         background-color: rgb(0, 145, 255);
         border: none;
@@ -338,7 +355,7 @@ h5 {
         top: 75%;
         background-color: #ffffffd7;
         padding: 10px 15px;
-        border-radius: 30px;
+        border-radius: 10px;
 
     }
 
@@ -359,5 +376,15 @@ h5 {
         overflow: hidden;
     }
 
+    .total {
+        position: fixed;
+        right: 10px;
+        bottom: 50px;
+        padding: 2px 20px;
+        border-radius: 30px;
+        background-color: rgb(0, 119, 255);
+        align-items: center;
+        z-index: 1;
+    }
 
 }

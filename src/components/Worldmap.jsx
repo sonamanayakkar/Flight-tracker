@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css"
 import L from 'leaflet'
 import { useMap } from "react-leaflet";
+import Mark from './Mark'
 
 
 const Worldmap = () => {
@@ -36,17 +37,10 @@ const Worldmap = () => {
 
     useEffect(() => {
         let countryapi = async () => {
-
-
             let api2 = await axios.get('https://countriesnow.space/api/v0.1/countries/positions')
             let mark_informations = api2.data.data
-            // console.log(mark_informations);
+
             setCountries(mark_informations)
-
-
-
-
-
 
         }
 
@@ -63,6 +57,7 @@ const Worldmap = () => {
 
 
             let final = api.data.states
+
 
 
             let findlat = countries.filter((ele, idx) => {
@@ -92,6 +87,8 @@ const Worldmap = () => {
                 let lat = ele[6]
                 let long = ele[5]
                 if (search == '' || search == 'india') {   //country
+
+
                     if (filter == 'All') {
                         return (
                             country == 'India' && lat !== null && long !== null
@@ -162,10 +159,10 @@ const Worldmap = () => {
     }
 
 
-    let createplaneicon = (angle) => {
+    let createplaneicon = (angle,logo) => {
         return L.divIcon({
             className: "custom-plane",
-            html: `<div class="plane" style="transform: rotate(${angle}deg)">✈️</div>`,
+            html: `<div class="plane" style="transform: rotate(${angle}deg)"><img src=${logo} alt='plane'/></div>`,
             iconSize: [30, 30],
         })
     }
@@ -183,7 +180,8 @@ const Worldmap = () => {
         flightmark.current[id].scrollIntoView({ behavior: "smooth", block: "center" })
         flightmark.current[id].style.background = " rgb(137, 208, 255)"
 
-
+        setToggle(!toggle)
+        slide.current.style.left = "10px"
 
 
 
@@ -194,13 +192,17 @@ const Worldmap = () => {
 
 
     let click = () => {
-        if (toggle) {
-            slide.current.style.top = "100%"
+        if (window.innerWidth < 800) {
+            if (toggle) {
+                slide.current.style.left = "10px"
+            }
+            else {
+                slide.current.style.left = "-100%"
+            }
+            setToggle(!toggle)
         }
-        else {
-            slide.current.style.top = "80px"
-        }
-        setToggle(!toggle)
+       
+
     }
 
 
@@ -226,25 +228,8 @@ const Worldmap = () => {
 
                     <MoveMap lat={lat.lat} long={lat.long} zoom={lat.zoom} />
 
-                    {flightdata && flightdata.length > 0 ? (
+                    <Mark datas={{ fil, createplaneicon, flightclick }} />
 
-                        fil.map((ele, idx) => {
-                            let lon = ele.long;
-                            let lat = ele.lat;
-                            return (<Marker Marker key={idx} position={[lat, lon]} icon={createplaneicon(ele.degree)} eventHandlers={{ click: () => flightclick(idx) }}>
-                                <Popup>
-                                    ✈️ {ele.address || "No Name"} <br />
-                                    Country: {ele.region} <br />
-                                    onground: {ele.onground} m/s <br />
-                                    speed:{ele.speed}<br />
-                                    cd: {ele.cd}
-                                </Popup>
-                            </Marker>
-                            )
-                        })
-                    )
-                        : (<p>no flight found</p>)
-                    }
                 </MapContainer>
 
 
@@ -315,15 +300,18 @@ const Worldmap = () => {
                     )
                     }
 
-                    <div className="total d-flex gap-3 ">
-                        <div className="flightimg"><img src={flightlogo} alt="" /></div>
-                        <div className="count m-0 text-white">{flightdata.length}</div>
-                    </div>
+
 
 
 
 
                 </div>
+                <div className="total d-flex gap-3 ">
+                    <div className="flightimg"><img src={flightlogo} alt="" /></div>
+                    <div className="count m-0 text-white">{flightdata.length}</div>
+                </div>
+
+
 
                 <div className="views">
                     <div className="r" onClick={() => setMap('https://tile.openstreetmap.org/{z}/{x}/{y}.png')}>
@@ -342,7 +330,8 @@ const Worldmap = () => {
             </div>
 
             <div className="up" onClick={click}>
-                <i className="fa-solid fa-angles-up"></i>
+                {toggle ? (<i className="fa-solid fa-angles-right"></i>) : (<i className="fa-solid fa-angles-left"></i>)}
+
             </div>
         </section >
     );
