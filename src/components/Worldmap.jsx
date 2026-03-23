@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import india from '../components/images/india.jpg'
 import flightlogo from './images/flightlogo.png'
 import satilite from './images/satilite.jpg'
@@ -15,6 +15,7 @@ import Mark from './Mark'
 const Worldmap = () => {
 
     let [flightdata, setFlightdata] = useState([])  //flight data
+    let [filtereddata, setFiltereddata] = useState({})
     let [search, setSearch] = useState('')    //search value
     let [filter, setFilter] = useState('All')  // filter value
     let [toggle, setToggle] = useState(false)  // toggle btn
@@ -51,116 +52,114 @@ const Worldmap = () => {
         countryapi()
     }, [])
 
+    const countriesdata = useMemo(() => {
+
+        return countries.filter((ele, idx) => {
+            if (search == "" || search == "India") {
+                return (
+                    ele.name == 'India' && ele.lat != null && ele.long != null
+                )
+            }
+            else {
+                let s = search.toLowerCase()
+
+                return (
+                    ele.name?.toLowerCase() == s && ele.lat != null && ele.long != null
+                )
+            }
+        })
+
+    }, [search, countries])
+
     useEffect(() => {
-        
+        if (countriesdata.length > 0) {
+            setLat({ ...countriesdata[0], zoom: 5 })
+        }
+        else {
+            setLat({ lat: 20, long: 77, zoom: 2 })
+        }
+    }, [countriesdata])
+
+    useEffect(() => {
+
         let apicall = async () => {
             setApicheck(false)
             let api = await axios.get('https://opensky-network.org/api/states/all', {
                 auth: { "clientId": "sonamanayakkar-api-client", "clientSecret": "HkORRn4pZKpoztKikNha6xxlGLNX2Arq" }
             })
 
-
             let final = api.data.states
-
-
-
-            let findlat = countries.filter((ele, idx) => {
-                if (search == "" || search == "India") {
-                    return (
-                        ele.name == 'India' && ele.lat != null && ele.long != null
-                    )
-                }
-                else {
-                    let s = search.toLowerCase()
-
-                    return (
-                        ele.name?.toLowerCase() == s && ele.lat != null && ele.long != null
-                    )
-                }
-            })
-
-
-
 
             setApicheck(true)
 
-            let india = final.filter((ele, idx) => {
+            setFlightdata(final)
 
+
+
+        }
+
+        apicall()
+
+    }, [])
+
+    //object conversion
+
+    useEffect(() => {
+
+
+        //[{},{},{}]    main important
+        if (flightdata && flightdata.length > 0) {
+            let filterbycountry = flightdata.filter((ele, idx) => {
                 let country = ele[2]
                 let ground = ele[8]
                 let lat = ele[6]
                 let long = ele[5]
-                if (search == '' || search == 'india') {   //country
-
-
+                if (search == '' || search == "india") {
                     if (filter == 'All') {
-                        return (
-                            country == 'India' && lat !== null && long !== null
-                        )
-                    }
 
-                    else if (filter == 'ground') {
-                        return (
-                            country == 'India' && ground && lat !== null && long !== null
-                        )
+                        return country == 'India' && lat !== null && long !== null
                     }
-                    else if (filter == 'sky') {
-                        return (
-                            country == 'India' && !ground && lat !== null && long !== null
-                        )
+                    else if (filter == "ground") {
+                        return country == 'India' && ground && lat !== null && long !== null
                     }
-
+                    else if (filter == "sky") {
+                        return country == 'India' && !ground && lat !== null && long !== null
+                    }
                 }
-
                 else {
                     let text = search.toLowerCase()
 
                     if (filter == 'All') {
-                        return (
-                            country?.toLowerCase().includes(text) && lat !== null && long !== null
-                        )
+                        return country?.toLowerCase().includes(text) && lat !== null && long !== null
                     }
-
-                    else if (filter == 'ground') {
-                        return (
-                            country?.toLowerCase().includes(text) && ground && lat !== null && long !== null
-                        )
+                    else if (filter == "ground") {
+                        return country?.toLowerCase().includes(text) && ground && lat !== null && long !== null
                     }
-                    else if (filter == 'sky') {
-                        return (
-                            country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null
-                        )
+                    else if (filter == "sky") {
+                        return country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null
                     }
                 }
-
-
             })
 
-            setFlightdata(india)
-            setLat(india.length > 0 ? { ...findlat[0], zoom: 5 } || { lat: 20, long: 77, zoom: 2 } : { lat: 20, long: 77, zoom: 2 })
+
+            let fil = filterbycountry.map(ele => ({
+                address: ele[1],
+                region: ele[2],
+                long: ele[5],
+                lat: ele[6],
+                degree: ele[10],
+                onground: ele[8],
+                speed: ele[9],
+                cd: ele[11]
+            }))
+
+
+
+            setFiltereddata(fil)
 
         }
-      
-        apicall()
+    }, [flightdata, search, filter])
 
-    }, [search, filter, countries])
-
-    //object conversion
-    let fil; //[{},{},{}]    main important
-    if (flightdata && flightdata.length > 0) {
-
-        fil = flightdata.map(ele => ({
-            address: ele[1],
-            region: ele[2],
-            long: ele[5],
-            lat: ele[6],
-            degree: ele[10],
-            onground: ele[8],
-            speed: ele[9],
-            cd: ele[11]
-        }))
-
-    }
 
 
     let createplaneicon = (angle, logo) => {
@@ -180,10 +179,10 @@ const Worldmap = () => {
         })
     }
 
-    let flightclick = (id) => {
+    let flightclick = (id, lat, lon) => {
         // console.log(flightmark.current);
 
-
+        setLive({ lat: 20, long: 77, zoom: 5, mark: false })
         flightmark.current.map((ele) => {
             if (ele != null) {
                 ele.style.background = " rgb(255, 255, 255)"
@@ -195,8 +194,7 @@ const Worldmap = () => {
 
         setToggle(!toggle)
         slide.current.style.left = "10px"
-
-
+        setLat({ lat: lon, long: lat, zoom: 10 })
 
 
     }
@@ -275,7 +273,7 @@ const Worldmap = () => {
 
 
 
-                    <Mark datas={{ fil, createplaneicon, flightclick }} />
+                    <Mark datas={{ filtereddata, createplaneicon, flightclick }} />
 
                     {live.mark ? (<Marker position={[live.lat, live.long]} icon={createliveicon()}>
                     </Marker>) : null}
@@ -301,43 +299,41 @@ const Worldmap = () => {
                     </div>
 
                     {apicheck ? (
-                        flightdata && flightdata.length > 0 ? (
-
-                            fil.filter(ele => ele.lat != null && ele.long != null)
-                                .map((ele, idx) => (
-                                    <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e}>
-                                        <div className="two f">
-                                            <div className="l">
-                                                <div className="small d-flex gap-3 align-items-center">
-                                                    <div className="image">
-                                                        <img src={flightlogo} alt="" />
-                                                    </div>
-                                                    <p className='m-0'>{ele.address}</p>
+                        filtereddata && filtereddata.length > 0 ? (
+                            filtereddata.map((ele, idx) => (
+                                <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e}>
+                                    <div className="two f">
+                                        <div className="l">
+                                            <div className="small d-flex gap-3 align-items-center">
+                                                <div className="image">
+                                                    <img src={flightlogo} alt="" />
                                                 </div>
-                                                <div className="region">{ele.region}</div>
+                                                <p className='m-0'>{ele.address}</p>
+                                            </div>
+                                            <div className="region">{ele.region}</div>
 
 
-                                            </div>
-                                            <div className="l d-flex gap-2 align-items-center">
-                                                <div className="indication" style={ele.onground ? { background: 'rgb(255, 60, 0)' } : { background: 'rgb(42, 255, 134)' }}></div>
-                                                <p className='m-0'>Inair</p>
-                                            </div>
                                         </div>
-                                        <div className="two2 p-2 d-flex gap-4">
-                                            <div className="r">
-                                                <h5>Speed</h5>
-                                                <h5>Status</h5>
-                                                <h5>Movement</h5>
-                                            </div>
-                                            <div className="r">
-                                                <h5 className='text-dark'>{ele.speed} kmPh</h5>
-                                                <h5> {ele.onground == true ? 'Landed' : "Flying"}</h5>
-                                                <h5>{ele.cd}</h5>
-                                            </div>
-
+                                        <div className="l d-flex gap-2 align-items-center">
+                                            <div className="indication" style={ele.onground ? { background: 'rgb(255, 60, 0)' } : { background: 'rgb(42, 255, 134)' }}></div>
+                                            <p className='m-0'>Inair</p>
                                         </div>
                                     </div>
-                                ))
+                                    <div className="two2 p-2 d-flex gap-4">
+                                        <div className="r">
+                                            <h5>Speed</h5>
+                                            <h5>Status</h5>
+                                            <h5>Movement</h5>
+                                        </div>
+                                        <div className="r">
+                                            <h5 className='text-dark'>{ele.speed} kmPh</h5>
+                                            <h5> {ele.onground == true ? 'Landed' : "Flying"}</h5>
+                                            <h5>{ele.cd}</h5>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            ))
 
                         ) : (<p className=' fs-2 fw-bold' style={{ color: "red" }}>no data found</p>)
                     ) : (
@@ -359,7 +355,7 @@ const Worldmap = () => {
                 </div>
                 <div className="total d-flex gap-3 ">
                     <div className="flightimg"><img src={flightlogo} alt="" /></div>
-                    <div className="count m-0 text-white">{flightdata.length}</div>
+                    <div className="count m-0 text-white">{filtereddata.length}</div>
                 </div>
 
 

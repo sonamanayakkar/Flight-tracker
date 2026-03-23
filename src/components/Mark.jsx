@@ -6,20 +6,20 @@ import { useMap } from "react-leaflet";
 import flightmark from './images/flightmark.png'
 
 const Mark = (props) => {
-    const { fil, createplaneicon, flightclick } = props.datas
+    const { filtereddata, createplaneicon, flightclick } = props.datas
 
 
 
 
     return (
 
-        fil && fil.length > 0 ? (
-            fil.map((ele, idx) => {
+        filtereddata && filtereddata.length > 0 ? (
+            filtereddata.map((ele, idx) => {
 
                 let lon = ele.long;
                 let lat = ele.lat;
 
-                return (< Marker key={idx} position={[lat, lon]} icon={createplaneicon(ele.degree,flightmark)} eventHandlers={{ click: () => flightclick(idx) }}>
+                return (< Marker key={idx} position={[lat, lon]} icon={createplaneicon(ele.degree,flightmark)} eventHandlers={{ click: () => flightclick(idx,lon,lat) }}>
                     <Popup>
                         ✈️ {ele.address || "No Name"} <br />
                         Country: {ele.region} <br />
