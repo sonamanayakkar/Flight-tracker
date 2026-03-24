@@ -23,6 +23,7 @@ const Worldmap = () => {
     let [map, setMap] = useState('http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}')  //maps
     let [lat, setLat] = useState({ lat: 20, long: 77, zoom: 5 })  //map zoom view
     let [countries, setCountries] = useState([])      //country data
+    let [refresh,setRefresh]=useState(false)
 
     let [live, setLive] = useState({ lat: 20, long: 77, zoom: 5, mark: false })
 
@@ -100,7 +101,7 @@ const Worldmap = () => {
 
         apicall()
 
-    }, [])
+    }, [refresh])
 
     //object conversion
 
@@ -114,29 +115,31 @@ const Worldmap = () => {
                 let ground = ele[8]
                 let lat = ele[6]
                 let long = ele[5]
+                let time=ele[3]
+                let height=ele[13]
                 if (search == '' || search == "india") {
                     if (filter == 'All') {
 
-                        return country == 'India' && lat !== null && long !== null
+                        return country == 'India' && lat !== null && long !== null && time!==null && height!==null
                     }
                     else if (filter == "ground") {
-                        return country == 'India' && ground && lat !== null && long !== null
+                        return country == 'India' && ground && lat !== null && long !== null && time!==null && height!==null
                     }
                     else if (filter == "sky") {
-                        return country == 'India' && !ground && lat !== null && long !== null
+                        return country == 'India' && !ground && lat !== null && long !== null && time!==null && height!==null
                     }
                 }
                 else {
                     let text = search.toLowerCase()
 
                     if (filter == 'All') {
-                        return country?.toLowerCase().includes(text) && lat !== null && long !== null
+                        return country?.toLowerCase().includes(text) && lat !== null && long !== null && time!==null && height!==null
                     }
                     else if (filter == "ground") {
-                        return country?.toLowerCase().includes(text) && ground && lat !== null && long !== null
+                        return country?.toLowerCase().includes(text) && ground && lat !== null && long !== null && time!==null && height!==null
                     }
                     else if (filter == "sky") {
-                        return country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null
+                        return country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null && time!==null && height!==null
                     }
                 }
             })
@@ -149,8 +152,9 @@ const Worldmap = () => {
                 lat: ele[6],
                 degree: ele[10],
                 onground: ele[8],
-                speed: ele[9],
-                cd: ele[11]
+                speed: parseInt((ele[9])*3.6),
+                cd: ele[11],
+                height:parseInt(ele[13]*3.28084)
             }))
 
 
@@ -283,9 +287,12 @@ const Worldmap = () => {
 
 
                 <div className="search">
-
-                    <input type="text" ref={searchvalue} placeholder='Search by country' name="" id="" />
-                    <button onClick={submitingdata}><i className="fa-solid fa-magnifying-glass"></i></button>
+                    <div className="inputs">
+                        <input type="text" ref={searchvalue} placeholder='Search by country' name="" id="" />
+                        <button onClick={submitingdata}><i className="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+        
+                    <div className="refresh" onClick={()=>setRefresh((e)=>!e)}><i className="fa-solid fa-arrows-rotate"></i></div>
                 </div>
 
                 <div className="totallists" ref={slide}>
@@ -322,11 +329,13 @@ const Worldmap = () => {
                                     <div className="two2 p-2 d-flex gap-4">
                                         <div className="r">
                                             <h5>Speed</h5>
+                                            <h5>Altitude</h5>
                                             <h5>Status</h5>
                                             <h5>Movement</h5>
                                         </div>
                                         <div className="r">
-                                            <h5 className='text-dark'>{ele.speed} kmPh</h5>
+                                            <h5 className='text-dark'>{(ele.speed)} km/h</h5>
+                                            <h5 className='text-dark'>{(ele.height)} ft</h5>
                                             <h5> {ele.onground == true ? 'Landed' : "Flying"}</h5>
                                             <h5>{ele.cd}</h5>
                                         </div>

@@ -24,8 +24,9 @@ const Mark = (props) => {
                         ✈️ {ele.address || "No Name"} <br />
                         Country: {ele.region} <br />
                         onground: {ele.onground} m/s <br />
-                        speed:{ele.speed}<br />
-                        cd: {ele.cd}
+                        speed:{(ele.speed)}  km/h<br />
+                        altitude:{(ele.height)} ft<br />
+                       
                     </Popup>
                 </Marker>)
             })
