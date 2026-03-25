@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import india from '../components/images/india.jpg'
 import flightlogo from './images/flightlogo.png'
+
 import satilite from './images/satilite.jpg'
 import normal from './images/normal.jpg'
 import './styles/world.css'
@@ -23,7 +24,7 @@ const Worldmap = () => {
     let [map, setMap] = useState('http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}')  //maps
     let [lat, setLat] = useState({ lat: 20, long: 77, zoom: 5 })  //map zoom view
     let [countries, setCountries] = useState([])      //country data
-    let [refresh,setRefresh]=useState(false)
+    let [refresh, setRefresh] = useState(false)
 
     let [live, setLive] = useState({ lat: 20, long: 77, zoom: 5, mark: false })
 
@@ -35,6 +36,7 @@ const Worldmap = () => {
     let searchvalue = useRef(null)
 
     let flightmark = useRef([])
+    let flightmarkinsidemap = useRef([])
 
     let submitingdata = () => {
         setSearch(searchvalue.current.value)
@@ -115,31 +117,31 @@ const Worldmap = () => {
                 let ground = ele[8]
                 let lat = ele[6]
                 let long = ele[5]
-                let time=ele[3]
-                let height=ele[13]
+                let time = ele[3]
+                let height = ele[13]
                 if (search == '' || search == "india") {
                     if (filter == 'All') {
 
-                        return country == 'India' && lat !== null && long !== null && time!==null && height!==null
+                        return country == 'India' && lat !== null && long !== null && time !== null
                     }
                     else if (filter == "ground") {
-                        return country == 'India' && ground && lat !== null && long !== null && time!==null && height!==null
+                        return country == 'India' && ground && lat !== null && long !== null && time !== null
                     }
                     else if (filter == "sky") {
-                        return country == 'India' && !ground && lat !== null && long !== null && time!==null && height!==null
+                        return country == 'India' && !ground && lat !== null && long !== null && time !== null && height !== null
                     }
                 }
                 else {
                     let text = search.toLowerCase()
 
                     if (filter == 'All') {
-                        return country?.toLowerCase().includes(text) && lat !== null && long !== null && time!==null && height!==null
+                        return country?.toLowerCase().includes(text) && lat !== null && long !== null && time !== null
                     }
                     else if (filter == "ground") {
-                        return country?.toLowerCase().includes(text) && ground && lat !== null && long !== null && time!==null && height!==null
+                        return country?.toLowerCase().includes(text) && ground && lat !== null && long !== null && time !== null
                     }
                     else if (filter == "sky") {
-                        return country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null && time!==null && height!==null
+                        return country?.toLowerCase().includes(text) && !ground && lat !== null && long !== null && time !== null && height !== null
                     }
                 }
             })
@@ -152,9 +154,9 @@ const Worldmap = () => {
                 lat: ele[6],
                 degree: ele[10],
                 onground: ele[8],
-                speed: parseInt((ele[9])*3.6),
+                speed: parseInt((ele[9]) * 3.6),
                 cd: ele[11],
-                height:parseInt(ele[13]*3.28084)
+                height: parseInt(ele[13] * 3.28084)
             }))
 
 
@@ -166,10 +168,11 @@ const Worldmap = () => {
 
 
 
-    let createplaneicon = (angle, logo) => {
+    let createplaneicon = (angle, logo1, logo2, ground) => {
+
         return L.divIcon({
             className: "custom-plane",
-            html: `<div class="plane" style="transform: rotate(${angle}deg)"><img src=${logo} alt='plane'/></div>`,
+            html: `<div class="plane" style="transform: rotate(${angle}deg)">${ground ? `<img src=${logo1} alt='plane'/>` : `<img src=${logo2} alt='plane'/>`}</div>`,
             iconSize: [30, 30],
         })
     }
@@ -203,6 +206,10 @@ const Worldmap = () => {
 
     }
 
+    let flightlistclick = (idx, lat, lon) => {
+        setLive({ lat: 20, long: 77, zoom: 5, mark: false })
+        setLat({ lat: lat, long: lon, zoom: 15 })
+    }
 
 
 
@@ -277,7 +284,7 @@ const Worldmap = () => {
 
 
 
-                    <Mark datas={{ filtereddata, createplaneicon, flightclick }} />
+                    <Mark datas={{ filtereddata, createplaneicon, flightclick, flightmarkinsidemap }} />
 
                     {live.mark ? (<Marker position={[live.lat, live.long]} icon={createliveicon()}>
                     </Marker>) : null}
@@ -291,8 +298,8 @@ const Worldmap = () => {
                         <input type="text" ref={searchvalue} placeholder='Search by country' name="" id="" />
                         <button onClick={submitingdata}><i className="fa-solid fa-magnifying-glass"></i></button>
                     </div>
-        
-                    <div className="refresh" onClick={()=>setRefresh((e)=>!e)}><i className="fa-solid fa-arrows-rotate"></i></div>
+
+                    <div className="refresh" onClick={() => setRefresh((e) => !e)}><i className="fa-solid fa-arrows-rotate"></i></div>
                 </div>
 
                 <div className="totallists" ref={slide}>
@@ -308,7 +315,7 @@ const Worldmap = () => {
                     {apicheck ? (
                         filtereddata && filtereddata.length > 0 ? (
                             filtereddata.map((ele, idx) => (
-                                <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e}>
+                                <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e} onClick={() => flightlistclick(idx, ele.lat, ele.long)}>
                                     <div className="two f">
                                         <div className="l">
                                             <div className="small d-flex gap-3 align-items-center">

@@ -4,12 +4,14 @@ import "leaflet/dist/leaflet.css"
 import L from 'leaflet'
 import { useMap } from "react-leaflet";
 import flightmark from './images/flightmark.png'
+import blueflight from './images/blueflight.png'
 
 const Mark = (props) => {
-    const { filtereddata, createplaneicon, flightclick } = props.datas
 
+    const { filtereddata, createplaneicon, flightclick ,flightmarkinsidemap} = props.datas
 
-
+    console.log(flightmarkinsidemap);
+    
 
     return (
 
@@ -19,7 +21,7 @@ const Mark = (props) => {
                 let lon = ele.long;
                 let lat = ele.lat;
 
-                return (< Marker key={idx} position={[lat, lon]} icon={createplaneicon(ele.degree,flightmark)} eventHandlers={{ click: () => flightclick(idx,lon,lat) }}>
+                return (< Marker key={idx} position={[lat, lon]} ref={(e)=>flightmarkinsidemap.current[idx]=e} icon={createplaneicon(ele.degree,flightmark,blueflight,ele.onground)} eventHandlers={{ click: () => flightclick(idx,lon,lat) }}>
                     <Popup>
                         ✈️ {ele.address || "No Name"} <br />
                         Country: {ele.region} <br />
