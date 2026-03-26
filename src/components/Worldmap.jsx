@@ -6,7 +6,7 @@ import satilite from './images/satilite.jpg'
 import normal from './images/normal.jpg'
 import './styles/world.css'
 import axios from 'axios'
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css"
 import L from 'leaflet'
 import { useMap } from "react-leaflet";
@@ -27,6 +27,9 @@ const Worldmap = () => {
     let [refresh, setRefresh] = useState(false)
 
     let [live, setLive] = useState({ lat: 20, long: 77, zoom: 5, mark: false })
+
+    let [checkweather, setWeather] = useState({ condition: false, index: 0 })
+    let [weatherdata, setWeatherdata] = useState({})
 
 
 
@@ -101,7 +104,10 @@ const Worldmap = () => {
 
         }
 
+
+
         apicall()
+
 
     }, [refresh])
 
@@ -189,15 +195,22 @@ const Worldmap = () => {
     let flightclick = (id, lat, lon) => {
         // console.log(flightmark.current);
 
+
         setLive({ lat: 20, long: 77, zoom: 5, mark: false })
         flightmark.current.map((ele) => {
             if (ele != null) {
-                ele.style.background = " rgb(255, 255, 255)"
+                flightmark.current[id].style.boxShadow='0px 0px 10px 5px rgb(0, 157, 255)'
             }
         })
 
+
+
         flightmark.current[id].scrollIntoView({ behavior: "smooth", block: "center" })
-        flightmark.current[id].style.background = " rgb(137, 208, 255)"
+        flightmark.current[id].style.boxShadow='0px 0px 10px 5px rgba(0, 157, 255, 0.38)'
+      
+
+
+
 
         setToggle(!toggle)
         slide.current.style.left = "10px"
@@ -226,6 +239,9 @@ const Worldmap = () => {
 
 
     }
+
+
+
 
 
 
@@ -269,12 +285,60 @@ const Worldmap = () => {
         }
     }
 
+
+    let weather = (condition, idx, lat, long) => {
+
+
+
+        setWeather({ condition: condition, index: idx })
+
+        if (condition) {
+
+            console.log("hello");
+            let apicall2 = async () => {
+                let weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=6d5537c504000fa78943d8d8ca819aa1`,
+                )
+
+
+                let weatherdata = weather.data.weather[0]
+                let winddata = weather.data.wind
+                let visibility = weather.data.visibility
+                let main = weather.data.main
+
+
+                let weatherobj = {
+                    description: weatherdata.description,
+                    icon: weatherdata.icon,
+                    windspeed: (winddata.speed) * 3.6,
+                    degree: winddata.deg,
+                    visibility: (visibility) / 1000,
+                    temperature: parseInt((main.temp) - 273.15),
+                    pressure: main.pressure,
+                    humidity: main.humidity
+                }
+                setWeatherdata(weatherobj)
+
+
+            }
+
+            apicall2()
+
+
+        }
+        else {
+            setWeather({ condition: condition, index: idx })
+        }
+
+    }
+
+
     // 13.0827, 80.2707
     return (
         <section>
             <div className="map">
                 <MapContainer className='link' center={[20, 77]} zoom={5} style={{ width: "100%", height: "100vh" }}>
                     <TileLayer url={map} />
+
 
                     <MoveMap
                         lat={live.mark ? live.lat : lat.lat}
@@ -315,40 +379,101 @@ const Worldmap = () => {
                     {apicheck ? (
                         filtereddata && filtereddata.length > 0 ? (
                             filtereddata.map((ele, idx) => (
-                                <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e} onClick={() => flightlistclick(idx, ele.lat, ele.long)}>
-                                    <div className="two f">
-                                        <div className="l">
-                                            <div className="small d-flex gap-3 align-items-center">
-                                                <div className="image">
-                                                    <img src={flightlogo} alt="" />
+
+                                (checkweather.condition && checkweather.index == idx ?
+                                    <div className="weathercard p" key={idx} ref={(e) => flightmark.current[idx] = e} onClick={() => flightlistclick(idx, ele.lat, ele.long)}>
+                                        <div className="two f">
+                                            <div className="l">
+                                                <div className="small d-flex gap-3 align-items-center">
+                                                    <div className="image">
+                                                        <img src={`https://openweathermap.org/img/wn/${weatherdata.icon}.png`} alt="" />
+                                                    </div>
+                                                    <p className='m-0'>{weatherdata.description}</p>
+
                                                 </div>
-                                                <p className='m-0'>{ele.address}</p>
+                                                <div className="region"></div>
+
+
                                             </div>
-                                            <div className="region">{ele.region}</div>
+                                            <div className="l">
+                                                <div className="small d-flex gap-3 align-items-center">
+                                                    {/* <div className="image">
+                                                        <img src={flightlogo} alt="" />
+                                                    </div> */}
+                                                    <p className='m-0'>{ele.address}</p>
+                                                </div>
+                                                {/* <div className="region">{ele.region}</div> */}
 
 
-                                        </div>
-                                        <div className="l d-flex gap-2 align-items-center">
-                                            <div className="indication" style={ele.onground ? { background: 'rgb(255, 60, 0)' } : { background: 'rgb(42, 255, 134)' }}></div>
-                                            <p className='m-0'>Inair</p>
-                                        </div>
-                                    </div>
-                                    <div className="two2 p-2 d-flex gap-4">
-                                        <div className="r">
-                                            <h5>Speed</h5>
-                                            <h5>Altitude</h5>
-                                            <h5>Status</h5>
-                                            <h5>Movement</h5>
-                                        </div>
-                                        <div className="r">
-                                            <h5 className='text-dark'>{(ele.speed)} km/h</h5>
-                                            <h5 className='text-dark'>{(ele.height)} ft</h5>
-                                            <h5> {ele.onground == true ? 'Landed' : "Flying"}</h5>
-                                            <h5>{ele.cd}</h5>
-                                        </div>
+                                            </div>
 
-                                    </div>
-                                </div>
+                                        </div>
+                                        <div className="two2 p-2 d-flex gap-4">
+                                            <div className="r">
+                                                <h5><i className="fa-solid fa-temperature-low me-2"></i>Temperature</h5>
+                                                <h5><i className="fa-solid fa-wind me-2"></i>Wind Speed</h5>
+                                                <h5><i className="fa-solid fa-compass me-2"></i>Degree</h5>
+                                                <h5><i className="fa-solid fa-eye-low-vision me-2"></i>Visibility</h5>
+                                                <h5><i className="fa-solid fa-gauge-high me-2"></i>Pressure</h5>
+                                                <h5><i className="fa-solid fa-droplet me-2"></i>Humidity</h5>
+                                            </div>
+                                            <div className="r">
+                                                <h5 className='text-dark'>{weatherdata.temperature} <sup>0</sup>C </h5>
+                                                <h5 className='text-dark'>{weatherdata.windspeed} km/h</h5>
+                                                <h5 className='text-dark'>{weatherdata.degree} </h5>
+                                                <h5>{weatherdata.visibility} km</h5>
+                                                <h5>{weatherdata.pressure}  hPa</h5>
+                                                <h5>{weatherdata.humidity}  %</h5>
+                                            </div>
+
+                                            <div className="checkweather" onClick={() => weather(false, idx, ele.lat, ele.long)}>
+                                                <p className='m-0 '>Back</p>
+                                            </div>
+
+                                        </div>
+                                    </div> : (
+                                        <div className="p" key={idx} ref={(e) => flightmark.current[idx] = e} onClick={() => flightlistclick(idx, ele.lat, ele.long)}>
+
+                                            <div className="two f">
+                                                <div className="l">
+                                                    <div className="small d-flex gap-3 align-items-center">
+                                                        <div className="image">
+                                                            <img src={flightlogo} alt="" />
+                                                        </div>
+                                                        <p className='m-0'>{ele.address}</p>
+                                                    </div>
+                                                    <div className="region">{ele.region}</div>
+
+
+                                                </div>
+                                                <div className="l d-flex gap-2 align-items-center">
+                                                    <div className="indication" style={ele.onground ? { background: 'rgb(255, 60, 0)' } : { background: 'rgb(42, 255, 134)' }}></div>
+                                                    <p className='m-0'>Inair</p>
+                                                </div>
+                                            </div>
+                                            <div className="two2 p-2 d-flex gap-4">
+                                                <div className="r">
+                                                    <h5>Speed</h5>
+                                                    <h5>Altitude</h5>
+                                                    <h5>Status</h5>
+                                                    <h5>Movement</h5>
+                                                </div>
+                                                <div className="r">
+                                                    <h5 className='text-dark'>{(ele.speed)} km/h</h5>
+                                                    <h5 className='text-dark'>{(ele.height)} ft</h5>
+                                                    <h5> {ele.onground == true ? 'Landed' : "Flying"}</h5>
+                                                    <h5>{ele.cd}</h5>
+                                                </div>
+
+                                                <div className="checkweather" onClick={() => weather(true, idx, ele.lat, ele.long)}>
+                                                    <p className='m-0 '><i class="fa-solid fa-cloud-sun"></i> weather</p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    )
+                                )
+
                             ))
 
                         ) : (<p className=' fs-2 fw-bold' style={{ color: "red" }}>no data found</p>)

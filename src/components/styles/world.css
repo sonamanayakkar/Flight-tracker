@@ -244,6 +244,40 @@ h5 {
     cursor: pointer;
 }
 
+.p .two2{
+    position: relative;
+    
+}
+
+.checkweather{
+    background-color: rgb(0, 157, 255);
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding:5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+   
+}
+
+.checkweather p{
+    font-size: .8rem;
+    font-weight: 500;
+    color: white;
+}
+
+.weathercard{
+    background: url(../images/weatherbg3.png) no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+.weathercard .two2{
+    background-color: rgba(255, 255, 255, 0.405);
+}
+.weathercard .two{
+    background-color: rgba(255, 255, 255, 0.39);
+}
+
 
 
 /*-------------loader----------------*/

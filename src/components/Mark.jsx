@@ -10,7 +10,7 @@ const Mark = (props) => {
 
     const { filtereddata, createplaneicon, flightclick ,flightmarkinsidemap} = props.datas
 
-    console.log(flightmarkinsidemap);
+
     
 
     return (
