@@ -310,7 +310,7 @@ const Worldmap = () => {
                 let weatherobj = {
                     description: weatherdata.description,
                     icon: weatherdata.icon,
-                    windspeed: (winddata.speed) * 3.6,
+                    windspeed:parseInt( (winddata.speed) * 3.6),
                     degree: winddata.deg,
                     visibility: (visibility) / 1000,
                     temperature: parseInt((main.temp) - 273.15),
