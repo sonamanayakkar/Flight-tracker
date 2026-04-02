@@ -92,27 +92,29 @@ const Worldmap = () => {
         let apicall = async () => {
             try {
                 setApicheck(false)
-                let api = await fetch(
+                // let api = await axios.get(
 
-                    "https://opensky-network.org/api/states/all"
-                    // {
-                    //     auth: {
-                    //         username: "sonamanayakkar-api-client",
-                    //         password: "zXIpuzwZvxb9GNEyVfJVDZA8gftSfdRl"
-                    //     }
-                    // }
-                )
-                let datas = await api.json()
-                console.log(datas);
+                //     "https://opensky-network.org/api/states/all"
+                //     // {
+                //     //     auth: {
+                //     //         username: "sonamanayakkar-api-client",
+                //     //         password: "zXIpuzwZvxb9GNEyVfJVDZA8gftSfdRl"
+                //     //     }
+                //     // }
+                // )
+                // let api = fetch('https://opensky-network.org/api/states/all')
+                // let api = await fetch('https://airlabs.co/api/v9/flights?api_key=efd28b94-871a-482a-b674-d50d35a80ef8')
+                let api = await fetch('https://opensky-network.org/api/states/all', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then((res) => res.json())
 
-
-
-
-                let final = datas.data
+                let final = api.states
 
                 setApicheck(true)
-
-
                 setFlightdata(final)
 
             } catch (error) {
