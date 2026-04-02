@@ -93,11 +93,18 @@ const Worldmap = () => {
             try {
                 setApicheck(false)
                 let api = await fetch(
-                    "http://localhost:5000/flights",
-                    )
+
+                    "https://opensky-network.org/api/states/all"
+                    // {
+                    //     auth: {
+                    //         username: "sonamanayakkar-api-client",
+                    //         password: "zXIpuzwZvxb9GNEyVfJVDZA8gftSfdRl"
+                    //     }
+                    // }
+                )
                 let datas = await api.json()
                 console.log(datas);
-                
+
 
 
 
