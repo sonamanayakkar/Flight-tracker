@@ -91,8 +91,8 @@ const Worldmap = () => {
 
         let apicall = async () => {
             setApicheck(false)
-            let api = await axios.get('https://opensky-network.org/api/states/all', {
-                auth: { "clientId": "sonamanayakkar-api-client", "clientSecret": "HkORRn4pZKpoztKikNha6xxlGLNX2Arq" }
+            let api = await axios.get('/opensky/api/states/all', {
+                auth: { "clientId":"sonamanayakkar-api-client","clientSecret":"zXIpuzwZvxb9GNEyVfJVDZA8gftSfdRl" }
             })
 
             let final = api.data.states
