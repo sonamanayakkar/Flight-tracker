@@ -90,16 +90,29 @@ const Worldmap = () => {
     useEffect(() => {
 
         let apicall = async () => {
-            setApicheck(false)
-            let api = await axios.get('/opensky/api/states/all', {
-                auth: { "clientId":"sonamanayakkar-api-client","clientSecret":"zXIpuzwZvxb9GNEyVfJVDZA8gftSfdRl" }
-            })
+            try {
+                setApicheck(false)
+                let api = await fetch(
+                    "http://localhost:5000/flights",
+                    )
+                let datas = await api.json()
+                console.log(datas);
+                
 
-            let final = api.data.states
 
-            setApicheck(true)
 
-            setFlightdata(final)
+                let final = datas.data
+
+                setApicheck(true)
+
+
+                setFlightdata(final)
+
+            } catch (error) {
+                console.log(error);
+                setApicheck(true)
+
+            }
 
 
 
@@ -108,6 +121,8 @@ const Worldmap = () => {
 
 
         apicall()
+
+
 
 
     }, [refresh])
@@ -295,7 +310,7 @@ const Worldmap = () => {
 
         if (condition) {
 
-          
+
             let apicall2 = async () => {
                 let weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=6d5537c504000fa78943d8d8ca819aa1`,
                 )
@@ -310,7 +325,7 @@ const Worldmap = () => {
                 let weatherobj = {
                     description: weatherdata.description,
                     icon: weatherdata.icon,
-                    windspeed:parseInt( (winddata.speed) * 3.6),
+                    windspeed: parseInt((winddata.speed) * 3.6),
                     degree: winddata.deg,
                     visibility: (visibility) / 1000,
                     temperature: parseInt((main.temp) - 273.15),

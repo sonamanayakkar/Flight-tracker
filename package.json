@@ -10,7 +10,9 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "axios": "^1.13.6",
+    "axios": "^1.14.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "framer-motion": "^12.38.0",
     "leaflet": "^1.9.4",
     "react": "^19.2.4",
@@ -28,5 +30,18 @@
     "gh-pages": "^6.3.0",
     "globals": "^17.4.0",
     "vite": "^8.0.0"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonamanayakkar/Flight-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sonamanayakkar/Flight-tracker/issues"
+  },
+  "homepage": "https://github.com/sonamanayakkar/Flight-tracker#readme"
 }
